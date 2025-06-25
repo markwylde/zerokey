@@ -1,19 +1,19 @@
 /**
  * @module client
- * 
+ *
  * Zero-knowledge secret sharing client implementation.
- * 
+ *
  * This module provides client-side functionality for securely transferring secrets
  * from an authentication domain to a client application without the auth domain
  * ever having access to the client's private key.
- * 
+ *
  * The zero-knowledge protocol works as follows:
  * 1. Client generates an ephemeral key pair
  * 2. Client sends only the public key to the auth domain
  * 3. Auth domain encrypts the secret with the public key
  * 4. Client receives and decrypts the secret with its private key
  * 5. The private key never leaves the client
- * 
+ *
  * @packageDocumentation
  */
 
@@ -154,33 +154,33 @@ function clearPendingKey(): void {
 
 /**
  * Initializes the zero-knowledge secret sharing client.
- * 
+ *
  * This function handles the complete flow of securely transferring a secret from an auth domain
  * to the client application without the auth domain ever knowing the client's private key.
- * 
+ *
  * The flow works as follows:
  * 1. On first call: Generates a key pair, stores the private key locally, and redirects to the auth domain
  *    with the public key.
  * 2. On return from auth domain: Extracts the encrypted secret from the URL fragment, decrypts it
  *    using the stored private key, and stores the decrypted secret in localStorage.
- * 
+ *
  * @param authUrl - The URL of the authentication domain that will provide the encrypted secret.
  *                  This URL should handle the public key and return the encrypted secret.
- * 
+ *
  * @throws {Error} If key generation fails during the initial flow
- * 
+ *
  * @example
  * ```typescript
  * // Initialize the client on page load
  * await initSecretClient('https://auth.example.com/zerokey');
- * 
+ *
  * // Listen for when the secret is ready
  * window.addEventListener('zerokey:ready', () => {
  *   const secret = getSecret();
  *   console.log('Secret is now available:', secret);
  * });
  * ```
- * 
+ *
  * @fires zerokey:ready - Fired when the secret has been successfully decrypted and stored
  */
 export async function initSecretClient(authUrl: string): Promise<void> {
@@ -257,13 +257,13 @@ export async function initSecretClient(authUrl: string): Promise<void> {
 
 /**
  * Retrieves the decrypted secret from localStorage.
- * 
+ *
  * This function should be called after the 'zerokey:ready' event has been fired,
  * indicating that the secret has been successfully decrypted and stored.
- * 
+ *
  * @returns The decrypted secret string if available, or null if no secret has been stored yet
  *          or if the authentication flow hasn't completed.
- * 
+ *
  * @example
  * ```typescript
  * // Get the secret after initialization
@@ -286,15 +286,15 @@ export function getSecret(): string | null {
 
 /**
  * Clears the stored secret and any pending authentication data from localStorage.
- * 
+ *
  * This function should be called when:
  * - The user logs out
  * - The secret expires or becomes invalid
  * - You need to restart the authentication flow
- * 
+ *
  * It removes both the decrypted secret and any pending key data that might be
  * waiting for the authentication flow to complete.
- * 
+ *
  * @example
  * ```typescript
  * // Clear the secret on logout
@@ -303,7 +303,7 @@ export function getSecret(): string | null {
  *   // Redirect to login page or reinitialize
  *   window.location.href = '/login';
  * }
- * 
+ *
  * // Or clear and restart the flow
  * clearSecret();
  * await initSecretClient('https://auth.example.com/zerokey');

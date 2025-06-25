@@ -1,12 +1,12 @@
 /**
  * @module server
- * 
+ *
  * Server-side implementation for the zero-knowledge secret sharing system.
- * 
+ *
  * This module provides functions to create a secure secret server that can share
  * secrets (like API keys or tokens) with requesting applications without either party
  * having access to both the encryption key and the plaintext secret.
- * 
+ *
  * The flow works as follows:
  * 1. The requesting app generates an RSA keypair and keeps the private key
  * 2. The app redirects the user to the secret server with the public key
@@ -14,21 +14,21 @@
  * 4. The secret is encrypted client-side with the public key
  * 5. The user is redirected back with the encrypted secret in the URL fragment
  * 6. The requesting app decrypts the secret with its private key
- * 
+ *
  * Security properties:
  * - The secret server never sees the private key
  * - The requesting app never sees the plaintext secret on the server
  * - The encrypted secret is passed via URL fragment (never sent to servers)
  * - CSRF protection via state parameter
- * 
+ *
  * @example
  * ```typescript
  * // In your secret server's client-side code:
  * import { initSecretServer, setSecret } from 'zerokey/server';
- * 
+ *
  * // Initialize on page load
  * initSecretServer();
- * 
+ *
  * // After user authentication, set the secret
  * const apiKey = await getUserApiKey(userId);
  * setSecret(apiKey);
@@ -82,12 +82,12 @@ declare global {
 /**
  * Parses URL query parameters from the current window location.
  * Extracts the publicKey, redirect, and state parameters needed for the zero-knowledge secret sharing flow.
- * 
+ *
  * @returns {QueryParams} An object containing the parsed query parameters
  * @returns {string | null} QueryParams.publicKey - The RSA public key for encrypting the secret
  * @returns {string | null} QueryParams.redirect - The URL to redirect to after encryption
  * @returns {string | null} QueryParams.state - The state parameter for CSRF protection
- * 
+ *
  * @example
  * // URL: https://secret-server.com?publicKey=...&redirect=https://app.com&state=abc123
  * const params = parseQueryParams();
@@ -106,10 +106,10 @@ function parseQueryParams(): QueryParams {
  * Validates that a redirect URL is safe to use.
  * Ensures the URL is properly formatted and uses either HTTP or HTTPS protocol.
  * This prevents potential security issues with malicious redirect URLs.
- * 
+ *
  * @param {string} url - The redirect URL to validate
  * @returns {boolean} True if the URL is valid and safe, false otherwise
- * 
+ *
  * @example
  * isValidRedirect('https://app.com/callback'); // returns true
  * isValidRedirect('javascript:alert(1)'); // returns false
@@ -129,15 +129,15 @@ function isValidRedirect(url: string): boolean {
  * Encrypts the secret with the provided public key and redirects to the specified URL.
  * The encrypted secret is passed in the URL fragment (hash) to ensure it's never sent to the server.
  * This maintains the zero-knowledge property of the system.
- * 
+ *
  * @param {string} secret - The plaintext secret to encrypt and transfer
  * @param {string} publicKey - The RSA public key (in PEM format) to encrypt the secret
  * @param {string} redirectUrl - The URL to redirect to after encryption
  * @param {string} state - The state parameter for CSRF protection and request correlation
  * @returns {Promise<void>} A promise that resolves when the redirect is performed
- * 
+ *
  * @throws {Error} May throw if encryption fails or URL parsing fails
- * 
+ *
  * @example
  * await performRedirect(
  *   'my-secret-api-key',
@@ -178,28 +178,28 @@ async function performRedirect(
  * Initializes the zero-knowledge secret server handler.
  * This function should be called when the secret server page loads.
  * It parses the query parameters, validates them, and prepares the system to receive a secret.
- * 
+ *
  * The function expects the following query parameters:
  * - publicKey: RSA public key for encrypting the secret
  * - redirect: URL to redirect to after processing
  * - state: CSRF protection state parameter
- * 
+ *
  * If a secret has already been set via `setSecret()` before initialization,
  * it will immediately process and redirect with the encrypted secret.
- * 
+ *
  * @returns {void}
- * 
+ *
  * @throws {Error} Logs errors if required parameters are missing or invalid
- * 
+ *
  * @example
  * // On page load of the secret server:
  * import { initSecretServer } from 'zerokey/server';
- * 
+ *
  * // Initialize when DOM is ready
  * document.addEventListener('DOMContentLoaded', () => {
  *   initSecretServer();
  * });
- * 
+ *
  * @example
  * // URL: https://secrets.example.com?publicKey=...&redirect=https://app.com&state=abc123
  * initSecretServer(); // Parses params and prepares for secret input
@@ -239,26 +239,26 @@ export function initSecretServer(): void {
  * Sets the secret that will be encrypted and transferred to the requesting application.
  * This function should be called after the user has authenticated and the server
  * has determined what secret (e.g., API key, token) to share.
- * 
+ *
  * If `initSecretServer()` has already been called and valid parameters are present,
  * this will immediately encrypt the secret and redirect. Otherwise, it stores the
  * secret until initialization occurs.
- * 
+ *
  * The secret is encrypted client-side using the public key provided in the query parameters,
  * ensuring the secret server never sees the public key and the requesting app never sees
  * the plaintext secret - maintaining zero-knowledge properties.
- * 
+ *
  * @param {string} secret - The plaintext secret to be encrypted and transferred
  * @returns {void}
- * 
+ *
  * @throws {Error} Logs an error if the secret is empty
- * 
+ *
  * @example
  * // After user authentication:
  * const userApiKey = await generateApiKeyForUser(userId);
  * setSecret(userApiKey);
  * // User is automatically redirected with encrypted secret
- * 
+ *
  * @example
  * // In a form submission handler:
  * document.getElementById('secret-form').addEventListener('submit', (e) => {
