@@ -36,6 +36,14 @@
     }
   },
   "files": {
-    "ignore": ["node_modules", "test-results", "playwright-report", "coverage", "dist"]
+    "ignore": [
+      "package.json",
+      "package-lock.json",
+      "node_modules",
+      "test-results",
+      "playwright-report",
+      "coverage",
+      "dist"
+    ]
   }
 }
