@@ -78,14 +78,14 @@ interface SecretServerOptions {
    * If provided, must return true for the URL to be accepted.
    * This provides an additional security layer to prevent unauthorized domains
    * from requesting secrets.
-   * 
+   *
    * @param url - The redirect URL to validate
    * @returns True if the URL should be allowed, false otherwise
-   * 
+   *
    * @example
    * // Only allow specific domain
    * validateCallbackUrl: (url) => url.startsWith('https://myapp.com')
-   * 
+   *
    * @example
    * // Allow multiple domains
    * validateCallbackUrl: (url) => {
