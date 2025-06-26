@@ -70,6 +70,33 @@ interface ZerokeyParams {
 }
 
 /**
+ * Configuration options for the secret server.
+ */
+interface SecretServerOptions {
+  /**
+   * Optional callback to validate the redirect URL.
+   * If provided, must return true for the URL to be accepted.
+   * This provides an additional security layer to prevent unauthorized domains
+   * from requesting secrets.
+   *
+   * @param url - The redirect URL to validate
+   * @returns True if the URL should be allowed, false otherwise
+   *
+   * @example
+   * // Only allow specific domain
+   * validateCallbackUrl: (url) => url.startsWith('https://myapp.com')
+   *
+   * @example
+   * // Allow multiple domains
+   * validateCallbackUrl: (url) => {
+   *   const allowed = ['https://app1.com', 'https://app2.com'];
+   *   return allowed.some(domain => url.startsWith(domain));
+   * }
+   */
+  validateCallbackUrl?: (url: string) => boolean;
+}
+
+/**
  * Global window extension to store validated zerokey parameters.
  * This allows the parameters to persist between initialization and secret setting.
  */
@@ -187,24 +214,40 @@ async function performRedirect(
  * If a secret has already been set via `setSecret()` before initialization,
  * it will immediately process and redirect with the encrypted secret.
  *
+ * @param {SecretServerOptions} options - Optional configuration for the secret server
+ * @param {Function} options.validateCallbackUrl - Optional callback to validate redirect URLs
  * @returns {void}
  *
  * @throws {Error} Logs errors if required parameters are missing or invalid
  *
  * @example
- * // On page load of the secret server:
+ * // Basic initialization
  * import { initSecretServer } from 'zerokey/server';
  *
- * // Initialize when DOM is ready
  * document.addEventListener('DOMContentLoaded', () => {
  *   initSecretServer();
  * });
  *
  * @example
- * // URL: https://secrets.example.com?publicKey=...&redirect=https://app.com&state=abc123
- * initSecretServer(); // Parses params and prepares for secret input
+ * // With domain validation for security
+ * initSecretServer({
+ *   validateCallbackUrl: (url) => url.startsWith('https://myapp.com')
+ * });
+ *
+ * @example
+ * // Allow multiple trusted domains
+ * initSecretServer({
+ *   validateCallbackUrl: (url) => {
+ *     const trustedDomains = [
+ *       'https://app.example.com',
+ *       'https://staging.example.com',
+ *       'http://localhost:3000' // for development
+ *     ];
+ *     return trustedDomains.some(domain => url.startsWith(domain));
+ *   }
+ * });
  */
-export function initSecretServer(): void {
+export function initSecretServer(options: SecretServerOptions = {}): void {
   if (isInitialized) {
     console.warn('Secret server already initialized');
     return;
@@ -223,6 +266,12 @@ export function initSecretServer(): void {
 
   if (!isValidRedirect(redirect)) {
     console.error('Invalid redirect URL');
+    return;
+  }
+
+  // Apply custom validation if provided
+  if (options.validateCallbackUrl && !options.validateCallbackUrl(redirect)) {
+    console.error('Redirect URL failed custom validation');
     return;
   }
 

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Validation Logging Test - Zerokey</title>
+  <meta charset="utf-8">
+</head>
+<body>
+  <h1>Validation Logging Test</h1>
+  <div id="status">Initializing...</div>
+  <div id="logged-url"></div>
+  
+  <script type="module">
+    import { initSecretServer } from '/server.js';
+
+    const statusEl = document.getElementById('status');
+    const loggedUrlEl = document.getElementById('logged-url');
+
+    try {
+      // Initialize with validation that logs the URL
+      initSecretServer({
+        validateCallbackUrl: (url) => {
+          loggedUrlEl.textContent = url;
+          return true; // Allow all for logging test
+        }
+      });
+
+      statusEl.textContent = 'Initialized with logging';
+    } catch (error) {
+      statusEl.textContent = 'Error: ' + error.message;
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Validation Test - Zerokey</title>
+  <meta charset="utf-8">
+</head>
+<body>
+  <h1>Validation Test</h1>
+  <div id="status">Initializing...</div>
+  
+  <script type="module">
+    import { initSecretServer } from '/server.js';
+
+    const statusEl = document.getElementById('status');
+    
+    // Capture console errors
+    const originalError = console.error;
+    console.error = function(...args) {
+      originalError.apply(console, args);
+      // Display validation errors in the status
+      if (args[0] === 'Redirect URL failed custom validation') {
+        statusEl.textContent = 'Redirect URL failed custom validation';
+      }
+    };
+
+    try {
+      // Initialize with domain validation
+      initSecretServer({
+        validateCallbackUrl: (url) => {
+          // Only allow localhost:3001 (our app domain)
+          return url.startsWith('http://localhost:3001');
+        }
+      });
+
+      // Check if we have params
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('publicKey') && params.get('redirect') && params.get('state')) {
+        // If we got here, validation passed
+        if (statusEl.textContent !== 'Redirect URL failed custom validation') {
+          statusEl.textContent = 'Secret request received!';
+        }
+      } else {
+        statusEl.textContent = 'Waiting for secret request...';
+      }
+    } catch (error) {
+      statusEl.textContent = 'Error: ' + error.message;
+    }
+  </script>
+</body>
+</html>

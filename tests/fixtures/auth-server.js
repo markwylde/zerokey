@@ -11,6 +11,15 @@ const PORT = 3002;
 // Serve static files from the root directory
 app.use(express.static(join(__dirname, '../..')));
 
+// Serve validation test pages
+app.get('/validation-test.html', (req, res) => {
+  res.sendFile(join(__dirname, 'validation-test.html'));
+});
+
+app.get('/validation-logging.html', (req, res) => {
+  res.sendFile(join(__dirname, 'validation-logging.html'));
+});
+
 // Serve the auth test page
 app.get('/', (req, res) => {
   res.send(`

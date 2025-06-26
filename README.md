@@ -92,14 +92,22 @@ clearSecret();
 
 ### Server API (`zerokey/server`)
 
-#### `initSecretServer(): void`
+#### `initSecretServer(options?: SecretServerOptions): void`
 
 Initializes the server handler on the auth domain. Parses query parameters and prepares for secret transfer.
 
 ```javascript
-// Call this when your auth page loads
+// Basic usage
 initSecretServer();
+
+// With domain validation for enhanced security
+initSecretServer({
+  validateCallbackUrl: (url) => url.startsWith('https://myapp.com')
+});
 ```
+
+**Options:**
+- `validateCallbackUrl?: (url: string) => boolean` - Optional callback to validate redirect URLs. This provides protection against unauthorized domains requesting secrets.
 
 #### `setSecret(secret: string): void`
 
@@ -118,6 +126,32 @@ setSecret(encryptionKey);
 3. **Auto-Expiry**: Pending keys expire after 5 minutes
 4. **CSRF Protection**: State parameter prevents replay attacks
 5. **HTTPS Required**: Always use HTTPS in production
+6. **Domain Validation**: Use `validateCallbackUrl` to restrict which domains can request secrets
+
+### Preventing Unauthorized Access
+
+By default, any domain can request a secret from your auth server. To prevent malicious sites from obtaining secrets, use the `validateCallbackUrl` option:
+
+```javascript
+// Only allow your specific app domain
+initSecretServer({
+  validateCallbackUrl: (url) => url.startsWith('https://myapp.com')
+});
+
+// Allow multiple trusted domains
+initSecretServer({
+  validateCallbackUrl: (url) => {
+    const trustedDomains = [
+      'https://app.example.com',
+      'https://staging.example.com',
+      'http://localhost:3000' // for development only - always use HTTPS in production
+    ];
+    return trustedDomains.some(domain => url.startsWith(domain));
+  }
+});
+```
+
+This prevents scenarios where `dodgysite.com` could redirect users to your auth server and attempt to obtain their secrets.
 
 ## Testing
 
