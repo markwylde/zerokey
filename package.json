@@ -1,6 +1,6 @@
 {
   "name": "zerokey",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "Zero-knowledge cross-domain secret sharing library using ECDH encryption",
   "type": "module",
   "main": "./dist/index.js",
@@ -24,7 +24,11 @@
       "require": "./dist/server.cjs"
     }
   },
-  "files": ["dist", "client.js", "server.js"],
+  "files": [
+    "dist",
+    "client.js",
+    "server.js"
+  ],
   "scripts": {
     "build": "tsup",
     "build:watch": "tsup --watch",
@@ -39,7 +43,14 @@
     "tidy": "biome check --write . && biome format --write .",
     "prepublishOnly": "npm run build"
   },
-  "keywords": ["crypto", "ecdh", "cross-domain", "zero-knowledge", "secret-sharing", "encryption"],
+  "keywords": [
+    "crypto",
+    "ecdh",
+    "cross-domain",
+    "zero-knowledge",
+    "secret-sharing",
+    "encryption"
+  ],
   "author": "",
   "license": "MIT",
   "devDependencies": {
