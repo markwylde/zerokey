@@ -24,11 +24,7 @@
       "require": "./dist/server.cjs"
     }
   },
-  "files": [
-    "dist",
-    "client.js",
-    "server.js"
-  ],
+  "files": ["dist", "client.js", "server.js"],
   "scripts": {
     "build": "tsup",
     "build:watch": "tsup --watch",
@@ -43,14 +39,7 @@
     "tidy": "biome check --write . && biome format --write .",
     "prepublishOnly": "npm run build"
   },
-  "keywords": [
-    "crypto",
-    "ecdh",
-    "cross-domain",
-    "zero-knowledge",
-    "secret-sharing",
-    "encryption"
-  ],
+  "keywords": ["crypto", "ecdh", "cross-domain", "zero-knowledge", "secret-sharing", "encryption"],
   "author": "",
   "license": "MIT",
   "devDependencies": {
